@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Grid Cube</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: url('bg.gif') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        canvas {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1; /* Set a lower z-index for the canvas to ensure it's behind other elements */
+    }
+        .logo {
+            position: absolute;
+            top: -10px;
+            right: 0px;
+            max-width: 100px; /* Adjust the max-width as needed */
+            z-index: 2; /* Ensure the logo is above other elements */
+        }
+
+        .text {
+            position: absolute;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .text.above {
+            top: 250px;
+        }
+
+        .text.below {
+            bottom: 250px;
+        }
+
+        .nav-dropdown {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            z-index: 2; /* Set a higher z-index for the dropdown */
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 3; /* Set an even higher z-index for dropdown content */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dropdown-content a {
+            color: #000000;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 3vw;
+        }
+
+        .center-text::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.7; /* Adjust the opacity as needed */
+        z-index: -1; /* Set a lower z-index to position behind the text */
+        }
+
+        .button-54 {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            color: #000;
+            cursor: pointer;
+            border: 3px solid;
+            padding: 0.25em 0.5em;
+            box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+            position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+        @media (min-width: 768px) {
+            .button-54 {
+                padding: 0.25em 0.75em;
+            }
+            .fade {
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+    }
+    </style>
+</head>
+<body style="background: url('bg.gif') no-repeat center center fixed; background-size: cover;">
+    <div class="logo">
+        <img src="logo.png" alt="Logo" style="max-width: 100%;">
+    </div>
+    <div class="nav-dropdown">
+        ROBOT ART COUNCIL
+        <div class="dropdown-content">
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="nav-dropdown" >
+            ROBOT ART COUNCIL
+            <div class="dropdown-content">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+        </div>
+
+    <div class="center-text">
+        Imagine this Box is Your Story
+    </div>
+    <button class="button-54" role="button">
+        Next...
+    </button>
+<script type="module">
+    import * as THREE from 'https://threejs.org/build/three.module.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const navDropdown = document.querySelector('.nav-dropdown');
+        const dropdownContent = document.querySelector('.dropdown-content');
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true }); // Set alpha to true for transparency
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create a group to contain the cube
+        const cubeGroup = new THREE.Group();
+        scene.add(cubeGroup);
+
+        const geometry = new THREE.BoxGeometry();
+        const edges = new THREE.EdgesGeometry(geometry);
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: '#ffffff',
+            transparent: true,
+            opacity: 1,
+            linewidth: 35,
+        }); // Set opacity for transparency
+        const cube = new THREE.LineSegments(edges, lineMaterial);
+        cubeGroup.add(cube);
+
+        const textAbove = document.createElement('div');
+        textAbove.classList.add('text', 'above');
+        document.body.appendChild(textAbove);
+
+        const textBelow = document.createElement('div');
+        textBelow.classList.add('text', 'below');
+        document.body.appendChild(textBelow);
+
+        camera.position.z = 4;
+
+        const delayBetweenTexts = 0; // Adjust the delay between texts (in milliseconds)
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        setTimeout(animate, delayBetweenTexts); // Start rendering after the delay
+
+        // Handle button click
+        const button = document.querySelector('.button-54');
+        button.addEventListener('click', () => {
+            window.location.href = '2.html';
+        });
+    });
+    function navigateTo(page) {
+            const currentPage = document.querySelector('.page:not(.hidden)');
+            const nextPage = document.querySelector(`.${page}`);
+            
+            if (currentPage && nextPage) {
+                currentPage.classList.add('fade');
+                setTimeout(() => {
+                    currentPage.classList.add('hidden');
+                    currentPage.classList.remove('fade');
+                    nextPage.classList.remove('hidden');
+                }, 500); // Delay the page transition to allow for the fade-out effect
+            }
+        }
+    </script>
+</script>
+
+</body>
+</html>

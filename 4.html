@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Grid Cube</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            font-size: 36px;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .logo {
+            position: absolute;
+            top: -10px;
+            right: 0px;
+            max-width: 100px; /* Adjust the max-width as needed */
+            z-index: 2; /* Ensure the logo is above other elements */
+        }
+
+        .text {
+            position: absolute;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+            font-size: 56px;
+        }
+
+        .text.above {
+            top: 250px;
+        }
+
+        .text.below {
+            bottom: 250px;
+            font-size: 36px;
+        }
+
+        .nav-dropdown {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            z-index: 2; /* Set a higher z-index for the dropdown */
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 3; /* Set an even higher z-index for dropdown content */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dropdown-content a {
+            color: #000000;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 3vw;
+        }
+
+        .center-text::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0.7; /* Adjust the opacity as needed */
+            z-index: -1; /* Set a lower z-index to position behind the text */
+        }
+
+        .button-54 {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            color: #000;
+            cursor: pointer;
+            border: 3px solid;
+            padding: 0.25em 0.5em;
+            box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+            position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .get-in-touch {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 3vw;
+        }
+
+        .get-in-touch::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .social-media {
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .social-media a {
+            color: white;
+            margin: 0 10px;
+            font-size: 1.5vw; /* Adjust font size for social media icons */
+        }
+
+        .social-media::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .get-in-touch.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .social-media.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            .button-54 {
+                padding: 0.25em 0.75em;
+            }
+
+            .page {
+                opacity: 1;
+                transition: opacity 0.5s ease-in-out;
+            }
+
+            .get-in-touch {
+                font-size: 3vw;
+            }
+
+            .get-in-touch::before,
+            .social-media::before {
+                opacity: 0.7;
+                z-index: -1;
+            }
+
+            .social-media {
+                top: 120%;
+                margin-bottom: 20px;
+            }
+
+            .hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+    </style>
+</head>
+<body style="background: url('bg.gif') no-repeat center center fixed; background-size: cover;">
+    <div class="logo">
+        <img src="logo.png" alt="Logo" style="max-width: 100%;">
+    </div>
+    <div class="nav-dropdown">
+        ROBOT ART COUNCIL
+        <div class="dropdown-content">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+    </div>
+    <div class="center-text">
+        The possibility is endless...
+    </div>
+    <button class="button-54" role="button">
+        Next...
+    </button>
+    <div class="get-in-touch hidden">
+        Get in touch with us!
+        <div class="social-media hidden">
+            <a href="https://www.instagram.com/robotartcouncil/">Instagram </a>
+            <a href="1.html">TikTok </a>
+            <a href="1.html">WhatsApp </a>
+        </div>
+    </div>
+    <script type="module">
+        import * as THREE from 'https://threejs.org/build/three.module.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const cubeGeometry = new THREE.BoxGeometry(3, 3, 3);
+const edges = new THREE.EdgesGeometry(cubeGeometry);
+const lineMaterial = new THREE.LineBasicMaterial({ color:'#ffffff' });
+
+const snakeSegments = [];
+const numSegments = 100;
+const segmentSpacing = 3;
+const dampingFactor = 0.1;
+
+for (let i = 0; i < numSegments; i++) {
+    const snakeSegment = new THREE.LineSegments(edges, lineMaterial);
+    scene.add(snakeSegment);
+    snakeSegments.push(snakeSegment);
+}
+
+// Set initial positions for snake segments
+for (let i = 0; i < numSegments; i++) {
+    snakeSegments[i].position.x = (numSegments / 2 - i) * segmentSpacing;
+}
+
+camera.position.z = 10;
+
+let previousMousePosition = { x: 0, y: 0 };
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    // Update snake position and rotation
+    for (let i = snakeSegments.length - 1; i > 0; i--) {
+        const targetPosition = snakeSegments[i - 1].position.clone();
+        const targetRotation = snakeSegments[i - 1].quaternion.clone();
+        const currentPosition = snakeSegments[i].position;
+        const currentRotation = snakeSegments[i].quaternion;
+
+        currentPosition.lerp(targetPosition, dampingFactor);
+        currentRotation.slerp(targetRotation, dampingFactor);
+    }
+
+    // Update snake head position and rotation based on mouse movement
+    snakeSegments[0].position.x = previousMousePosition.x * 5;
+    snakeSegments[0].position.y = -previousMousePosition.y * 5;
+
+    snakeSegments[0].rotation.x = 0;
+    snakeSegments[0].rotation.y = 0;
+    snakeSegments[0].rotation.z = Math.atan2(previousMousePosition.y, previousMousePosition.x);
+
+    renderer.render(scene, camera);
+}
+
+document.addEventListener('mousemove', (event) => {
+    previousMousePosition = {
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: (event.clientY / window.innerHeight) * 2 - 1,
+    };
+});
+
+// Centering the snake head after setting the initial mouse position
+snakeSegments[0].position.set(previousMousePosition.x * 5, -previousMousePosition.y * 5, 0);
+
+animate();
+
+const button = document.querySelector('.button-54');
+button.addEventListener('click', () => {
+  // Hide the existing content
+  const centerText = document.querySelector('.center-text');
+  centerText.style.display = 'none'; // Hide the element instead of changing its content
+
+  // Show the "Get in touch with us" text and social media logos
+  const getInTouch = document.querySelector('.get-in-touch');
+  getInTouch.classList.remove('hidden');
+
+  // Show the social media icons
+  const socialMedia = document.querySelector('.social-media');
+  socialMedia.classList.remove('hidden');
+
+  button.textContent = 'Home';
+    button.setAttribute('onclick', 'location.href="1.html";');
+});
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+})
+    </script>
+</body>
+</html>

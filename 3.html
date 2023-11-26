@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Grid Cube</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            font-size: 36px;
+            
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Set a lower z-index for the canvas to ensure it's behind other elements */
+}
+
+.logo {
+            position: absolute;
+            top: -10px;
+            right: 0px;
+            max-width: 100px; /* Adjust the max-width as needed */
+            z-index: 2; /* Ensure the logo is above other elements */
+        }
+        .text {
+            position: absolute;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+            font-size: 56px;
+        }
+
+        .text.above {
+            top: 250px;
+        }
+
+        .text.below {
+            bottom: 250px;
+            font-size: 36px;
+        }
+
+        .nav-dropdown {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            z-index: 2; /* Set a higher z-index for the dropdown */
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 3; /* Set an even higher z-index for dropdown content */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dropdown-content a {
+            color: #000000;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 3vw;
+        }
+
+        .center-text::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.7; /* Adjust the opacity as needed */
+        z-index: -1; /* Set a lower z-index to position behind the text */
+        }
+
+        .button-54 {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            color: #000;
+            cursor: pointer;
+            border: 3px solid;
+            padding: 0.25em 0.5em;
+            box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+            position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+        @media (min-width: 768px) {
+            .button-54 {
+                padding: 0.25em 0.75em;
+            }
+
+            .page {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        }
+    </style>
+</head>
+<body style="background: url('bg.gif') no-repeat center center fixed; background-size: cover;">
+    <div class="logo">
+        <img src="logo.png" alt="Logo" style="max-width: 100%;">
+    </div>
+    <div class="nav-dropdown">
+        ROBOT ART COUNCIL
+        <div class="dropdown-content">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+    </div>
+
+    
+    <div class="center-text">
+        A lot of magic touches...
+    </div>
+    <button class="button-54" role="button" onclick="window.location.href='int1.html'">
+        Next...
+    </button>
+    <script type="module">
+        import * as THREE from 'https://threejs.org/build/three.module.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+        const cubes = [];
+
+        for (let i = 0; i < 50; i++) {
+            const cubeGeometry = new THREE.BoxGeometry();
+            const edges = new THREE.EdgesGeometry(cubeGeometry);
+            const lineMaterial = new THREE.LineBasicMaterial({ color: '#ffffff' });
+            const cube = new THREE.LineSegments(edges, lineMaterial);
+
+            cube.initialPosition = new THREE.Vector3(
+                (Math.random() - 0.5) * 10,
+                Math.random() * 10,
+                (Math.random() - 0.5) * 10
+            );
+
+            cube.position.copy(cube.initialPosition.clone()); // Set initial position
+            cube.initialSize = cube.scale.clone(); // Store the initial size
+
+            scene.add(cube);
+
+            // Adjust the cube's pivot point
+            cube.geometry.computeBoundingBox();
+            const boundingBox = cube.geometry.boundingBox;
+            const pivotOffset = new THREE.Vector3(
+                (boundingBox.max.x - boundingBox.min.x) / 2,
+                (boundingBox.max.y - boundingBox.min.y) / 2,
+                (boundingBox.max.z - boundingBox.min.z) / 2
+            );
+            cube.pivot = new THREE.Group();
+            cube.add(cube.pivot);
+            cube.pivot.position.copy(pivotOffset);
+            cube.position.sub(pivotOffset);
+
+            cubes.push(cube);
+        }
+
+        camera.position.z = 5;
+
+        let previousMousePosition = { x: 0, y: 0 };
+        let cubeSpeed = 0.1;
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('wheel', handleMouseWheel);
+
+        function handleMouseMove(event) {
+            const currentMousePosition = {
+                x: event.clientX / window.innerWidth * 2 - 1,
+                y: event.clientY / window.innerHeight * 2 - 1,
+            };
+
+            const delta = {
+                x: currentMousePosition.x - previousMousePosition.x,
+                y: currentMousePosition.y - previousMousePosition.y,
+            };
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(currentMousePosition, camera);
+
+            cubes.forEach((cube, index) => {
+                // Check for intersection with the cube
+                const intersects = raycaster.intersectObject(cube);
+
+                if (intersects.length > 0) {
+                    // Smoothly follow the mouse with a damping effect
+                    cube.position.x += (currentMousePosition.x * 5 - cube.position.x) * cubeSpeed;
+                    cube.position.y += (-currentMousePosition.y * 5 - cube.position.y) * cubeSpeed;
+                }
+
+                // Rotate the cube based on mouse movement
+                cube.rotation.x += delta.y * 1.5; // Increase rotation level
+                cube.rotation.y += delta.x * 1.5; // Increase rotation level
+
+                // Reset the cube's position and size if it goes off-screen
+                if (cube.position.x > 10 || cube.position.x < -10 || cube.position.y < -10) {
+                    cube.position.copy(cube.initialPosition.clone());
+                    cube.scale.copy(cube.initialSize);
+                    cube.pivot.rotation.set(0, 0, 0); // Reset rotation
+                }
+            });
+
+            previousMousePosition = currentMousePosition;
+        }
+
+        function handleMouseWheel(event) {
+            const delta = event.deltaY;
+            camera.position.z += delta * 0.35;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Move cubes infinitely in the Y-axis at normal speed
+            cubes.forEach((cube) => {
+                cube.position.y -= 0.035;
+
+                // Reset position and size when cube goes below a certain threshold
+                if (cube.position.y < -2) {
+                    cube.position.copy(cube.initialPosition.clone());
+                    cube.scale.copy(cube.initialSize);
+                    cube.pivot.rotation.set(0, 0, 0); // Reset rotation
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+        const button = document.querySelector('.button-54');
+        button.addEventListener('click', () => {
+            window.location.href = '4.html';
+        });
+    </script>
+</body>
+</html>

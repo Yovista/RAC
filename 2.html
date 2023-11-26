@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Grid Cube</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: url('bg.gif') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Set a lower z-index for the canvas to ensure it's behind other elements */
+}
+
+.logo {
+            position: absolute;
+            top: -10px;
+            right: 0px;
+            max-width: 100px; /* Adjust the max-width as needed */
+            z-index: 2; /* Ensure the logo is above other elements */
+        }
+
+
+        .text {
+            position: absolute;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            top: 68%;
+            font-size: 1.5vw;
+        }
+
+
+        .nav-dropdown {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            z-index: 2; /* Set a higher z-index for the dropdown */
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 3; /* Set an even higher z-index for dropdown content */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dropdown-content a {
+            color: #000000;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 3vw;
+        }
+
+        .center-text::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.7; /* Adjust the opacity as needed */
+        z-index: -1; /* Set a lower z-index to position behind the text */
+        }
+
+        .button-54 {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-transform: uppercase;
+            color: #000;
+            cursor: pointer;
+            border: 3px solid;
+            padding: 0.25em 0.5em;
+            box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+            position: absolute;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+        @media (min-width: 768px) {
+            .button-54 {
+                padding: 0.25em 0.75em;
+            }
+
+            .page {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        }
+    </style>
+</head>
+<body style="background: url('bg.gif') no-repeat center center fixed; background-size: cover;">
+    <div class="logo">
+        <img src="logo.png" alt="Logo" style="max-width: 100%;">
+    </div>
+    <div class="nav-dropdown">
+        ROBOT ART COUNCIL
+        <div class="dropdown-content">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+    </div>
+
+    
+    <div class="center-text">
+        With code & programming, we give your story a magic touch...
+    </div>
+    <div class="text">
+        (Move Your Pointer)
+    </div>
+    <button class="button-54" role="button">
+        Next...
+    </button>
+    <script type="module">
+        import * as THREE from 'https://threejs.org/build/three.module.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true }); // Set alpha to true for transparency
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create a group to contain the cube
+        const cubeGroup = new THREE.Group();
+        scene.add(cubeGroup);
+
+        const geometry = new THREE.BoxGeometry();
+        const edges = new THREE.EdgesGeometry(geometry);
+        const lineMaterial = new THREE.LineBasicMaterial({ color: '#ffffff' });
+        const cube = new THREE.LineSegments(edges, lineMaterial);
+        cubeGroup.add(cube);
+
+        camera.position.z = 4;
+
+        let previousMousePosition = { x: 0, y: 0 };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('wheel', handleMouseWheel);
+
+        function handleMouseMove(event) {
+            const currentMousePosition = {
+                x: event.clientX / window.innerWidth * 2 - 1,
+                y: -(event.clientY / window.innerHeight) * 2 + 1,
+            };
+
+            const delta = {
+                x: currentMousePosition.x - previousMousePosition.x,
+                y: currentMousePosition.y - previousMousePosition.y,
+            };
+
+            cubeGroup.rotation.x += delta.y * 5;
+            cubeGroup.rotation.y += delta.x * 5;
+
+            previousMousePosition = currentMousePosition;
+        }
+
+        function handleMouseWheel(event) {
+            const delta = event.deltaY;
+            camera.position.z += delta * 0.01;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+        const button = document.querySelector('.button-54');
+        button.addEventListener('click', () => {
+            window.location.href = '3.html';
+        });
+    </script>
+</body>
+</html>
